@@ -3,8 +3,10 @@ const mongoose = require("mongoose");
 const UserSchema = mongoose.Schema(
     {
         username:{type:String,require:true},
-        email:{type:String,require:true},
-        password:{type:String,require:true}
+        email:{type:String,require:true,unique:true},
+        password:{type:String,require:true},
+        active:{type:Boolean,default:true},
+        deleted:{type:Boolean,default:false},
     },
     {timestamps:true}
 )

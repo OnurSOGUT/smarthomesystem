@@ -19,20 +19,21 @@ router.post("/register", async (req, res) => {
       await newUser.save();
       res.status(200).json("A new user created successfully.");
     } catch (error) {
-      res.status(400).json(error);
+
+        if (error.code === 11000) {
+          // Duplicate key error
+          res.status(400).json({ message: "Bu e-posta adresi zaten kullanılıyor" });
+        } else {
+            res.status(500).json({ message: "Bir hata oluştu" });
+        }
     }
   });
 
 
 //login
-
 router.post("/login",async(req,res)=>{
     try {
         const user = await User.findOne({email:req.body.email});
-
-        // console.log(user);
-
-        // const user = { id: 1, username: 'example' };
 
         if (user) {
             
@@ -48,15 +49,14 @@ router.post("/login",async(req,res)=>{
 
                 // Token oluşturulur ve kullanıcıya gönderilir
                 const userModel={
+                    userId:user._id,
                     username:user.username,
-                    demsayTedarikciId:user.demsayTedarikciId
                 }
                  const token = jwt.sign(userModel, `${process.env.SECRET_KEY}`);
-                // res.json({ token })
-                // user.token=token;
-                userModel.token=token
-                //  console.log(token);
-                res.status(200).json(userModel);
+
+                 userModel.token=token
+             
+                 res.status(200).json(userModel);
             }
         }
         else{
@@ -104,8 +104,8 @@ router.post("/change-password", async (req, res) => {
     }
   });
   
-//reset password
 
+//reset password
 router.post("/reset-password", async (req, res) => {
 
   try {
